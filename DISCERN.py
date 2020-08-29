@@ -109,8 +109,8 @@ class DISCERN:
             similarity_submatrix = self.similarity_matrix[centroid_idx, :][:, remaining]
             ctr += 1
 
-        membership_values = membership_values[:ctr]
         if find_n_clusters:
+            membership_values = membership_values[:ctr]
             x = range(0, len(membership_values))
 
             dy = np.gradient(membership_values, x)
