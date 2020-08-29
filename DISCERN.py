@@ -18,6 +18,7 @@ class DISCERN:
         self.inertia_ = None
         self.cluster_centers_ = None
         self.n_iter_ = None
+        self.km_instance = None
 
     def _prep(self, input_data):
         """
@@ -57,7 +58,7 @@ class DISCERN:
 
         # Run K-Means
         self.km_instance = KMeans(n_clusters=len(self.cluster_centers_),
-                             init=self.cluster_centers_, n_init=1)
+                                  init=self.cluster_centers_, n_init=1)
         self.km_instance.fit(data)
 
         self.labels_ = self.km_instance.labels_
