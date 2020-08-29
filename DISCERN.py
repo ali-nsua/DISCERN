@@ -86,7 +86,7 @@ class DISCERN:
         find_n_clusters = self.num_clusters < 2
 
         if find_n_clusters:
-            membership_values = np.zeros(max_iter, dtype=float)
+            membership_values = np.zeros(max_iter+1, dtype=float)
 
         while len(remaining) > 1 and ctr <= max_iter:
             if 1 < self.num_clusters <= len(centroid_idx):
