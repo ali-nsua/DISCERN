@@ -1,5 +1,5 @@
 import numpy as np
-from utils import cosine_similarity
+from .utils import cosine_similarity
 from sklearn.cluster import KMeans
 
 
@@ -56,14 +56,18 @@ class DISCERN:
         self.cluster_centers_ = data[init_centroid_idx, :]
 
         # Run K-Means
-        km_instance = KMeans(n_clusters=len(self.cluster_centers_),
+        self.km_instance = KMeans(n_clusters=len(self.cluster_centers_),
                              init=self.cluster_centers_, n_init=1)
-        km_instance.fit(data)
+        self.km_instance.fit(data)
 
-        self.labels_ = km_instance.labels_
-        self.inertia_ = km_instance.inertia_
-        self.cluster_centers_ = km_instance.cluster_centers_
-        self.n_iter_ = km_instance.n_iter_
+        self.labels_ = self.km_instance.labels_
+        self.inertia_ = self.km_instance.inertia_
+        self.cluster_centers_ = self.km_instance.cluster_centers_
+        self.n_iter_ = self.km_instance.n_iter_
+
+    def predict(self, input_data):
+        data = self._prep(input_data)
+        return self.km_instance.predict(data)
 
     def _run_discern(self):
         centroid_idx_0, centroid_idx_1 = np.unravel_index(
