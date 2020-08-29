@@ -40,7 +40,7 @@ Stay tuned for more notebooks.
 ## References
 
 <div id="moco">
-[1] He, Kaiming, Haoqi Fan, Yuxin Wu, Saining Xie, and Ross Girshick. "Momentum contrast for unsupervised visual representation learning." In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pp. 9729-9738. 2020. (<a href="https://arxiv.org/abs/1911.05722">arXiv</a><a href="https://github.com/facebookresearch/moco/">GitHub</a>) 
+[1] He, Kaiming, Haoqi Fan, Yuxin Wu, Saining Xie, and Ross Girshick. "Momentum contrast for unsupervised visual representation learning." In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pp. 9729-9738. 2020. (<a href="https://arxiv.org/abs/1911.05722">arXiv</a> | <a href="https://github.com/facebookresearch/moco/">GitHub</a>) 
 </div>
 <div id="mocov2">
 [2] Chen, Xinlei, Haoqi Fan, Ross Girshick, and Kaiming He. "Improved baselines with momentum contrastive learning." <a href="https://arxiv.org/abs/1911.05722">arXiv preprint arXiv:2003.04297</a> (2020).
