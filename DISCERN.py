@@ -1,5 +1,5 @@
 import numpy as np
-from utils import cosine_similarity
+from .utils import cosine_similarity
 from sklearn.cluster import KMeans
 
 
