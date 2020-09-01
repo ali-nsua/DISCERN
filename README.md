@@ -32,7 +32,7 @@ di = DISCERN(max_n_clusters=1000)
 
 ## Notebooks
 
-Two Jupyter notebooks are also provided in this repository. Multivariate applies DISCERN to two of the multivariate datasets in the paper.
+Two Jupyter notebooks are also provided in this repository (see `examples/`). Multivariate applies DISCERN to two of the multivariate datasets in the paper.
 The other (ImageNette) applies it to <a href="https://github.com/fastai/imagenette">one of the image datasets in the paper, ImageNette</a>. However, unlike the paper, the notebook uses MoCo <a href="#moco">[1]</a><a href="#mocov2">[2]</a> instead of a labeled-imagenet pretrained ResNet.
 
 Stay tuned for more notebooks.
