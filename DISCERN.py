@@ -4,13 +4,20 @@ from sklearn.cluster import KMeans
 
 
 class DISCERN:
+    """
+    DISCERN is a K-Means initializer, finding suitable centroids for K-Means to begin with and therefore increase
+    the probability for quicker convergence. Moreover, DISCERN does not require the number of clusters (K), as it
+    can estimate a suitable number on its own.
 
-    def __init__(self, n_clusters=0, max_iter=None, metric='euclidean'):
+    NOTE: DISCERN has a very large complexity w.r.t the number of samples, therefore if an upper bound is known for
+    the number of clusters, it should be set to improve speed (max_n_clusters).
+    """
+    def __init__(self, n_clusters=0, max_n_clusters=None, metric='euclidean'):
         """
         Initialization
         """
         self.num_clusters = n_clusters  # Manually fix the number of clusters
-        self.max_iter = max_iter
+        self.max_n_clusters = max_n_clusters
         self.metric = 1 if metric == 'cosine' else 0
 
         self.similarity_matrix = None
@@ -82,13 +89,13 @@ class DISCERN:
         similarity_submatrix = self.similarity_matrix[centroid_idx, :][:, remaining]
 
         ctr = 2
-        max_iter = len(self.similarity_matrix) if self.max_iter is None else self.max_iter
+        max_n_clusters = len(self.similarity_matrix) if self.max_n_clusters is None else self.max_n_clusters
         find_n_clusters = self.num_clusters < 2
 
         if find_n_clusters:
-            membership_values = np.zeros(max_iter+1, dtype=float)
+            membership_values = np.zeros(max_n_clusters+1, dtype=float)
 
-        while len(remaining) > 1 and ctr <= max_iter:
+        while len(remaining) > 1 and ctr <= max_n_clusters:
             if 1 < self.num_clusters <= len(centroid_idx):
                 break
 

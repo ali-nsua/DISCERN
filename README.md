@@ -27,7 +27,7 @@ di = DISCERN(metric='cosine')
 ```
 Specify an upper bound for the number of clusters
 ```python3
-di = DISCERN(max_iter=max_n_clusters)
+di = DISCERN(max_n_clusters=1000)
 ```
 
 ## Notebooks
