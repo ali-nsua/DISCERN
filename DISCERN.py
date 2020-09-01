@@ -1,5 +1,5 @@
 import numpy as np
-from .utils import cosine_similarity
+from .utils.ops import cosine_similarity
 from sklearn.cluster import KMeans
 
 
@@ -39,6 +39,10 @@ class DISCERN:
         self.similarity_matrix, data_normalized = cosine_similarity(data)
 
         if self.metric > 0:
+            """
+            Using normalized data (unit length vectors) with the Euclidean norm is very similar to
+            spherical clustering in theory, but the actual results may slightly differ.
+            """
             return data_normalized
 
         return data
@@ -73,11 +77,26 @@ class DISCERN:
         self.cluster_centers_ = self.km_instance.cluster_centers_
         self.n_iter_ = self.km_instance.n_iter_
 
+    def fit_predict(self, input_data):
+        """
+        Fits K-Means on the input data using DISCERN initialization, returns the clustering assignments
+        """
+        self.fit(input_data)
+        return self.labels_
+
     def predict(self, input_data):
+        """
+        Returns the clustering assignments on new input data
+        """
         data = self._prep(input_data)
         return self.km_instance.predict(data)
 
     def _run_discern(self):
+        """
+        Runs DISCERN;
+        This part may seem very confusing if you haven't read the paper yet:
+        https://arxiv.org/pdf/1910.05933.pdf
+        """
         centroid_idx_0, centroid_idx_1 = np.unravel_index(
             self.similarity_matrix.argmin(), self.similarity_matrix.shape
         )
@@ -95,6 +114,7 @@ class DISCERN:
         if find_n_clusters:
             membership_values = np.zeros(max_n_clusters+1, dtype=float)
 
+        # DISCERN initialization for c_3, c_4, ... , c_l, ...
         while len(remaining) > 1 and ctr <= max_n_clusters:
             if 1 < self.num_clusters <= len(centroid_idx):
                 break
@@ -117,13 +137,15 @@ class DISCERN:
             ctr += 1
 
         if find_n_clusters:
+            # K-Estimation
             membership_values = membership_values[:ctr]
             x = range(0, len(membership_values))
 
+            # Compute the curvature of the function
             dy = np.gradient(membership_values, x)
             d2y = np.gradient(dy, x)
-
             kappa = (d2y / ((1 + (dy ** 2)) ** (3 / 2)))
+
             predicted_n_clusters = np.argmin(kappa)
             n_clusters = max(predicted_n_clusters, 2)
         else:
