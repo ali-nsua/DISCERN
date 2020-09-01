@@ -33,14 +33,14 @@ di = DISCERN(max_n_clusters=1000)
 ## Notebooks
 
 Two Jupyter notebooks are also provided in this repository. Multivariate applies DISCERN to two of the multivariate datasets in the paper.
-The other (ImageNette) applies it to one of the image datasets in the paper. However, unlike the paper, the notebook uses MoCo <a href="#moco">[1]</a><a href="#mocov2">[2]</a> instead of a labeled-imagenet pretrained ResNet.
+The other (ImageNette) applies it to <a href="https://github.com/fastai/imagenette">one of the image datasets in the paper, ImageNette</a>. However, unlike the paper, the notebook uses MoCo <a href="#moco">[1]</a><a href="#mocov2">[2]</a> instead of a labeled-imagenet pretrained ResNet.
 
 Stay tuned for more notebooks.
 
 ## References
 
 <div id="moco">
-[1] He, Kaiming, Haoqi Fan, Yuxin Wu, Saining Xie, and Ross Girshick. "Momentum contrast for unsupervised visual representation learning." In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pp. 9729-9738. 2020. (<a href="https://arxiv.org/abs/1911.05722">arXiv</a><a href="https://github.com/facebookresearch/moco/">GitHub</a>) 
+[1] He, Kaiming, Haoqi Fan, Yuxin Wu, Saining Xie, and Ross Girshick. "Momentum contrast for unsupervised visual representation learning." In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pp. 9729-9738. 2020. (<a href="https://arxiv.org/abs/1911.05722">arXiv</a> | <a href="https://github.com/facebookresearch/moco/">GitHub</a>) 
 </div>
 <div id="mocov2">
 [2] Chen, Xinlei, Haoqi Fan, Ross Girshick, and Kaiming He. "Improved baselines with momentum contrastive learning." <a href="https://arxiv.org/abs/1911.05722">arXiv preprint arXiv:2003.04297</a> (2020).
