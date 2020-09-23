@@ -1,6 +1,5 @@
 # DISCERN: Diversity-based Selection of Centroids for k-Estimation and Rapid Non-stochastic Clustering
-This repository contains the implementation of DISCERN in Python.
-You can find the paper on [arXiv](https://arxiv.org/abs/1910.05933).
+This repository contains the implementation of [DISCERN](https://link.springer.com/article/10.1007/s13042-020-01193-5) in Python. You can download the manuscript from [my website](https://alihassanijr.com/files/DISCERN.pdf) or [arXiv](https://arxiv.org/abs/1910.05933).
 
 ## Examples
 ```python3
@@ -36,6 +35,17 @@ Two Jupyter notebooks are also provided in this repository (see `examples/`). Mu
 The other (ImageNette) applies it to <a href="https://github.com/fastai/imagenette">one of the image datasets in the paper, ImageNette</a>. However, unlike the paper, the notebook uses MoCo <a href="#moco">[1]</a><a href="#mocov2">[2]</a> instead of a labeled-imagenet pretrained ResNet.
 
 Stay tuned for more notebooks.
+
+## Citation
+```
+@article{hassani2020discern,
+	title        = {DISCERN: diversity-based selection of centroids for k-estimation and rapid non-stochastic clustering},
+	author       = {Hassani, Ali and Iranmanesh, Amir and Eftekhari, Mahdi and Salemi, Abbas},
+	year         = 2020,
+	journal      = {International Journal of Machine Learning and Cybernetics},
+	doi          = {10.1007/s13042-020-01193-5}
+}
+```
 
 ## References
 
