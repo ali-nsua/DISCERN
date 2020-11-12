@@ -1,11 +1,36 @@
 # DISCERN: Diversity-based Selection of Centroids for k-Estimation and Rapid Non-stochastic Clustering
 This repository contains the implementation of [DISCERN](https://link.springer.com/article/10.1007/s13042-020-01193-5) in Python. You can download the manuscript from [my website](https://alihassanijr.com/files/DISCERN.pdf) or [arXiv](https://arxiv.org/abs/1910.05933).
 
+## :red_circle: GPU-based DISCERN
+:red_circle: New :red_circle:
+This is just another implementation of DISCERN, except it is implemented in PyTorch instead of your average numpy. As a result, we can use all of the CUDA greatness to boost DISCERN beyond imagination.
+
+```python3
+from DISCERN import TorchDISCERN
+
+di = DISCERN()
+di.fit(X)
+
+clustering_labels = di.labels_
+cluster_centers = di.cluster_centers_
+sse_loss = di.inertia_
+```
+For now, it automatically sets the variables to CUDA if it is available.
+
+For those who've read the paper: the similarity precomputation and diversity-based selection are now a lot faster than on an average CPU. I'm also working on a torch-based K-Means to really push this over the edge.
+
+Here's the progress so far:
+:white_check_mark: Cosine similarity matrix computation
+:white_check_mark: Diversity-based selection
+:black_square_button: Finite differences
+:black_square_button: K-Estimation
+:black_square_button: K-Means
+
 ## Examples
 ```python3
 X = load_data() # This is assumed to be a 2-dimensional numpy array, where rows represent data samples.
 ```
-Basic DISCERN instance:
+Basic DISCERN instance (numpy-based):
 ```python3
 from DISCERN import DISCERN
 
@@ -28,6 +53,7 @@ Specify an upper bound for the number of clusters
 ```python3
 di = DISCERN(max_n_clusters=1000)
 ```
+
 
 ## Notebooks
 
