@@ -1,5 +1,6 @@
+import torch
 import numpy as np
-from .utils.ops import cosine_similarity
+from .utils.ops import torch_cosine_similarity, torch_unravel_index
 from sklearn.cluster import KMeans
 
 
