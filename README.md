@@ -21,10 +21,15 @@ For now, it automatically sets the variables to CUDA if it is available.
 For those who've read the paper: the similarity precomputation and diversity-based selection are now a lot faster than on an average CPU. I'm also working on a torch-based K-Means to really push this over the edge.
 
 Here's the progress so far:
+
 :white_check_mark: Cosine similarity matrix computation
+
 :white_check_mark: Diversity-based selection
+
 :black_square_button: Finite differences
+
 :black_square_button: K-Estimation
+
 :black_square_button: K-Means
 
 ## Examples
