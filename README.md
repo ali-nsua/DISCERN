@@ -3,6 +3,7 @@ This repository contains the implementation of [DISCERN](https://link.springer.c
 
 ## :red_circle: GPU-based DISCERN
 :red_circle: New :red_circle:
+
 This is just another implementation of DISCERN, except it is implemented in PyTorch instead of your average numpy. As a result, we can use all of the CUDA greatness to boost DISCERN beyond imagination.
 
 ```python3
