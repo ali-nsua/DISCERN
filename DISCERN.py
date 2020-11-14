@@ -154,6 +154,15 @@ class _DISCERN:
         data = self._prep(input_data)
         return self.km_instance.predict(data)
 
+    def _initial_centroid_indices(self):
+        raise NotImplementedError
+
+    def _get_membership_vector(self, similarity_submatrix):
+        raise NotImplementedError
+
+    def _k_estimation(self, membership_values):
+        raise NotImplementedError
+
     def _run_discern(self):
         """
         Runs DISCERN and estimates the number of clusters and returns the indices of samples fit to be the
@@ -166,7 +175,41 @@ class _DISCERN:
         -------
         centroid_indices : list
         """
-        raise NotImplementedError
+        centroid_idx_0, centroid_idx_1 = self._initial_centroid_indices()
+        centroid_idx = [centroid_idx_0, centroid_idx_1]
+
+        remaining = [y for y in range(0, len(self.similarity_matrix)) if y not in centroid_idx]
+
+        similarity_submatrix = self.similarity_matrix[centroid_idx, :][:, remaining]
+
+        ctr = 2
+        max_n_clusters = len(self.similarity_matrix) if self.max_n_clusters is None else self.max_n_clusters
+        find_n_clusters = self.num_clusters is None or self.num_clusters < 2
+
+        membership_values = None if not find_n_clusters else np.zeros(max_n_clusters+1, dtype=float)
+
+        # DISCERN initialization for c_3, c_4, ... , c_l, ...
+        while len(remaining) > 1 and ctr <= max_n_clusters:
+            if self.num_clusters is not None and 1 < self.num_clusters <= len(centroid_idx):
+                break
+            membership_vector, min_idx, min_value = self._get_membership_vector(similarity_submatrix)
+            new_centroid_idx = remaining[min_idx]
+            if find_n_clusters:
+                membership_values[ctr] = min_value
+            centroid_idx.append(new_centroid_idx)
+            remaining.remove(new_centroid_idx)
+            similarity_submatrix = self.similarity_matrix[centroid_idx, :][:, remaining]
+            ctr += 1
+
+        if find_n_clusters:
+            membership_values = membership_values[:ctr]
+            n_clusters = self._k_estimation(membership_values)
+        else:
+            n_clusters = self.num_clusters
+
+        centroid_idx = centroid_idx[:n_clusters]
+
+        return centroid_idx
 
 
 class DISCERN(_DISCERN):
@@ -258,74 +301,23 @@ class DISCERN(_DISCERN):
         self.km_instance.fit(data)
         return self
 
-    def _run_discern(self):
-        """
-        Runs DISCERN and estimates the number of clusters and returns the indices of samples fit to be the
-        initial centroids.
+    def _initial_centroid_indices(self):
+        return np.unravel_index(self.similarity_matrix.argmin(), self.similarity_matrix.shape)
 
-        This part may seem very confusing if you haven't read the paper yet:
-        https://arxiv.org/abs/1910.05933
+    def _get_membership_vector(self, similarity_submatrix):
+        min_vector, max_vector = np.min(similarity_submatrix, axis=0), np.max(similarity_submatrix, axis=0)
+        diff_vector = max_vector - min_vector
+        membership_vector = np.square(max_vector) * min_vector * diff_vector
+        min_idx = int(np.argmin(membership_vector))
+        return membership_vector, min_idx, membership_vector[min_idx]
 
-        Returns
-        -------
-        centroid_indices : list
-        """
-        centroid_idx_0, centroid_idx_1 = np.unravel_index(
-            self.similarity_matrix.argmin(), self.similarity_matrix.shape
-        )
-
-        centroid_idx = [centroid_idx_0, centroid_idx_1]
-
-        remaining = [y for y in range(0, len(self.similarity_matrix)) if y not in centroid_idx]
-
-        similarity_submatrix = self.similarity_matrix[centroid_idx, :][:, remaining]
-
-        ctr = 2
-        max_n_clusters = len(self.similarity_matrix) if self.max_n_clusters is None else self.max_n_clusters
-        find_n_clusters = self.num_clusters is None or self.num_clusters < 2
-
-        membership_values = None if not find_n_clusters else np.zeros(max_n_clusters+1, dtype=float)
-
-        # DISCERN initialization for c_3, c_4, ... , c_l, ...
-        while len(remaining) > 1 and ctr <= max_n_clusters:
-            if self.num_clusters is not None and 1 < self.num_clusters <= len(centroid_idx):
-                break
-
-            max_vector = np.max(similarity_submatrix, axis=0)
-            min_vector = np.min(similarity_submatrix, axis=0)
-            diff_vector = max_vector - min_vector
-
-            membership_vector = np.square(max_vector) * min_vector * diff_vector
-
-            min_idx = int(np.argmin(membership_vector))
-            new_centroid_idx = remaining[min_idx]
-
-            if find_n_clusters:
-                membership_values[ctr] = membership_vector[min_idx]
-
-            centroid_idx.append(new_centroid_idx)
-            remaining.remove(new_centroid_idx)
-            similarity_submatrix = self.similarity_matrix[centroid_idx, :][:, remaining]
-            ctr += 1
-
-        if find_n_clusters:
-            # K-Estimation
-            membership_values = membership_values[:ctr]
-            x = range(0, len(membership_values))
-
-            # Compute the curvature of the function
-            dy = np.gradient(membership_values, x)
-            d2y = np.gradient(dy, x)
-            kappa = (d2y / ((1 + (dy ** 2)) ** (3 / 2)))
-
-            predicted_n_clusters = int(np.argmin(kappa))
-            n_clusters = max(predicted_n_clusters, 2)
-        else:
-            n_clusters = self.num_clusters
-
-        centroid_idx = centroid_idx[:n_clusters]
-
-        return centroid_idx
+    def _k_estimation(self, membership_values):
+        x = range(0, len(membership_values))
+        dy = np.gradient(membership_values, x)
+        d2y = np.gradient(dy, x)
+        kappa = (d2y / ((1 + (dy ** 2)) ** (3 / 2)))
+        predicted_n_clusters = int(np.argmin(kappa))
+        return max(predicted_n_clusters, 2)
 
 
 class TorchDISCERN(_DISCERN):
@@ -423,71 +415,23 @@ class TorchDISCERN(_DISCERN):
         self.km_instance.fit(data)
         return self
 
-    def _run_discern(self):
-        """
-        Runs DISCERN and estimates the number of clusters and returns the indices of samples fit to be the
-        initial centroids.
+    def _initial_centroid_indices(self):
+        return torch_unravel_index(
+            int(torch.argmin(self.similarity_matrix)),self.similarity_matrix.shape)
 
-        This part may seem very confusing if you haven't read the paper yet:
-        https://arxiv.org/abs/1910.05933
+    def _get_membership_vector(self, similarity_submatrix):
+        min_vector, max_vector = torch.min(similarity_submatrix, dim=0).values, \
+                                 torch.max(similarity_submatrix, dim=0).values
+        diff_vector = max_vector - min_vector
+        membership_vector = torch.square(max_vector) * min_vector * diff_vector
+        min_idx = int(torch.argmin(membership_vector).item())
+        return membership_vector, min_idx, float(membership_vector[min_idx].data)
 
-        Returns
-        -------
-        centroid_indices : list
-        """
-        centroid_idx_0, centroid_idx_1 = torch_unravel_index(int(torch.argmin(self.similarity_matrix)),
-                                                             self.similarity_matrix.shape)
-
-        centroid_idx = [centroid_idx_0, centroid_idx_1]
-
-        remaining = [y for y in range(0, len(self.similarity_matrix)) if y not in centroid_idx]
-
-        similarity_submatrix = self.similarity_matrix[centroid_idx, :][:, remaining]
-
-        ctr = 2
-        max_n_clusters = len(self.similarity_matrix) if self.max_n_clusters is None else self.max_n_clusters
-        find_n_clusters = self.num_clusters is None or self.num_clusters < 2
-
-        membership_values = None if not find_n_clusters else np.zeros(max_n_clusters+1, dtype=float)
-
-        # DISCERN initialization for c_3, c_4, ... , c_l, ...
-        while len(remaining) > 1 and ctr <= max_n_clusters:
-            if self.num_clusters is not None and 1 < self.num_clusters <= len(centroid_idx):
-                break
-
-            max_vector = torch.max(similarity_submatrix, dim=0).values
-            min_vector = torch.min(similarity_submatrix, dim=0).values
-            diff_vector = max_vector - min_vector
-
-            membership_vector = torch.square(max_vector) * min_vector * diff_vector
-
-            min_idx = int(torch.argmin(membership_vector).item())
-            new_centroid_idx = remaining[min_idx]
-
-            if find_n_clusters:
-                membership_values[ctr] = float(membership_vector[min_idx].data)
-
-            centroid_idx.append(new_centroid_idx)
-            remaining.remove(new_centroid_idx)
-            similarity_submatrix = self.similarity_matrix[centroid_idx, :][:, remaining]
-            ctr += 1
-
-        if find_n_clusters:
-            # TODO: Torch-based finite differences, curvature estimation and K estimation
-            # K-Estimation
-            membership_values = membership_values[:ctr]
-            x = range(0, len(membership_values))
-
-            # Compute the curvature of the function
-            dy = np.gradient(membership_values, x)
-            d2y = np.gradient(dy, x)
-            kappa = (d2y / ((1 + (dy ** 2)) ** (3 / 2)))
-
-            predicted_n_clusters = int(np.argmin(kappa))
-            n_clusters = max(predicted_n_clusters, 2)
-        else:
-            n_clusters = self.num_clusters
-
-        centroid_idx = centroid_idx[:n_clusters]
-
-        return centroid_idx
+    def _k_estimation(self, membership_values):
+        # TODO: torch-based implementation
+        x = range(0, len(membership_values))
+        dy = np.gradient(membership_values, x)
+        d2y = np.gradient(dy, x)
+        kappa = (d2y / ((1 + (dy ** 2)) ** (3 / 2)))
+        predicted_n_clusters = int(np.argmin(kappa))
+        return max(predicted_n_clusters, 2)
