@@ -188,7 +188,6 @@ class _DISCERN:
 
         membership_values = None if not find_n_clusters else np.zeros(max_n_clusters+1, dtype=float)
 
-        # DISCERN initialization for c_3, c_4, ... , c_l, ...
         while len(remaining) > 1 and ctr <= max_n_clusters:
             if self.num_clusters is not None and 1 < self.num_clusters <= len(centroid_idx):
                 break
@@ -417,7 +416,7 @@ class TorchDISCERN(_DISCERN):
 
     def _initial_centroid_indices(self):
         return torch_unravel_index(
-            int(torch.argmin(self.similarity_matrix)),self.similarity_matrix.shape)
+            int(torch.argmin(self.similarity_matrix)), self.similarity_matrix.shape)
 
     def _get_membership_vector(self, similarity_submatrix):
         min_vector, max_vector = torch.min(similarity_submatrix, dim=0).values, \
