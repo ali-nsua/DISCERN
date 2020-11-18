@@ -61,6 +61,6 @@ def torch_cosine_similarity(x):
     cosine_similarity_matrix : torch.Tensor
     x_normalized : torch.Tensor
     """
-    x_normalized = F.normalize(x, p=1, dim=1)
+    x_normalized = F.normalize(x, p=2, dim=1)
     xxt = x_normalized.matmul(x_normalized.T)
     return ((1 + xxt) / 2), x_normalized
